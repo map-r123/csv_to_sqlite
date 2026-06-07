@@ -4,10 +4,11 @@ A simple Python script that reads data from a `.csv` file and stores it into a S
 
 ## 📌 Features
 
-* Reads CSV files with `;` (semicolon) delimiter
+* Reads CSV files
+* Autonatically detects the delimiter used
 * Automatically creates a SQLite table based on CSV headers
 * Inserts all rows into the database
-* Handles UTF-8 encoded files (including BOM)
+* Handles UTF-8 encoded files =
 
 ---
 
@@ -15,7 +16,7 @@ A simple Python script that reads data from a `.csv` file and stores it into a S
 
 ```
 .
-├── script.py        # Main Python script
+├── etl.py        # Main Python script
 ├── data.db          # SQLite database (created automatically)
 └── README.md        # Project documentation
 ```
@@ -25,25 +26,26 @@ A simple Python script that reads data from a `.csv` file and stores it into a S
 ## ⚙️ Requirements
 
 * Python 3.9+
-* No external libraries required (uses built-in modules only):
-
-  * `csv`
+* External libraries required:
+  * `detect_delimiter`
+* Built-in modules used:
   * `sqlite3`
   * `pathlib`
+  * `csv`
 
 ---
 
 ## 🚀 How to Use
 
-1. Place your `.csv` file in the same directory as the script.
+1. Place your `.csv` file in the same directory as the script or have the path to the `.csv` file
 
 2. Run the script:
 
 ```
-python script.py
+python etl.py
 ```
 
-3. Enter the CSV file name when prompted:
+3. Enter the CSV file name or path when prompted:
 
 ```
 Enter CSV Name: example.csv
@@ -60,7 +62,6 @@ Enter CSV Name: example.csv
 
 ## 🧾 CSV Format Requirements
 
-* Must use **semicolon (`;`)** as a delimiter
 * First row must contain column headers
 
 Example:
@@ -78,7 +79,7 @@ Bob;30;Paris
 * Database file: `data.db`
 * Table name: `Data`
 * All columns are stored as `TEXT`
-* Column names are derived from CSV headers:
+* Column names are based from CSV headers:
 
   * Spaces are replaced with underscores (`_`)
 
@@ -86,17 +87,15 @@ Bob;30;Paris
 
 ## ⚠️ Notes
 
-* If the file is not found, the script will prompt again
+* If the file is not found, the script will raise a file not found error
 * Duplicate or conflicting inserts may be ignored
-* Large CSV files may take longer due to row-by-row insertion
+* If delimiter is not found an error will be rasised
 
 ---
 
 ## 🔧 Possible Improvements
 
 * Automatic data type detection (INTEGER, REAL, etc.)
-* Support for different delimiters
-* Bulk insert optimization (`executemany`)
 * Command-line arguments instead of input prompt
 * Better error handling and logging
 
