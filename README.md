@@ -8,7 +8,7 @@ A simple Python script that reads data from a `.csv` file and stores it into a S
 * Autonatically detects the delimiter used
 * Automatically creates a SQLite table based on CSV headers
 * Inserts all rows into the database
-* Handles UTF-8 encoded files =
+* Handles UTF-8 encoded files
 
 ---
 
