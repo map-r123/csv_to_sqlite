@@ -9,8 +9,10 @@ def read_file(file_name):
     
     try:
         with open(file_name, newline="", encoding="UTF-8-sig") as file:
+            # Detects the limiter used
             delimiter = detect(file.read())
             file.seek(0)
+
             reader = csv.DictReader(file,delimiter=delimiter)
 
             for row in reader:
@@ -60,20 +62,22 @@ def write(data, fieldnames):
         columns = columns.removesuffix(",")
 
         placeholders = ",".join(["?"] * len(fieldnames))
-
+        
+        #creates a list of list with the individual rows inside a list
+        values = []
         for row in data:
-            # list with all the data that should be insert into the database
-            values = []
+            row_values =[]
             for col in fieldnames:
-                values.append(row.get(col))
+                row_values.append(row.get(col))
 
-            try:
-                cursor.execute(
-                    f"INSERT INTO Data ({columns})" f"VALUES ({placeholders}) ",
-                    (values),
-                )
-            except sqlite3.IntegrityError:
-                pass
+            values.append(row_values)
+
+        try:
+            cursor.executemany(
+                f"INSERT INTO Data ({columns})" f"VALUES ({placeholders}) ", values
+            )
+        except sqlite3.IntegrityError:
+            pass
         print("Table created")
         conn.commit()
         cursor.close()
