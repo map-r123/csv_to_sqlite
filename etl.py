@@ -1,22 +1,27 @@
 import csv
 import sqlite3
 from pathlib import Path
+import sys
+from detect_delimiter import detect
 
 def read_file(file_name):
     output = []
-    count = 0
+    
     try:
         with open(file_name, newline="", encoding="UTF-8-sig") as file:
-            reader = csv.DictReader(file, delimiter=";")
+            delimiter = detect(file.read())
+            file.seek(0)
+            reader = csv.DictReader(file,delimiter=delimiter)
 
             for row in reader:
-                output += [row]
-                count += 1
+                output.append(row)
 
-        return output, reader.fieldnames
-
-    except FileNotFoundError:
-        print(file_name, "was not found")
+            return output, reader.fieldnames
+    except TypeError as error:
+        sys.exit("Delimiter not found")
+    except FileNotFoundError :
+        error = file_name+" was not found"
+        raise FileNotFoundError(error)
 
 
 def create_db(fieldnames):
@@ -55,17 +60,16 @@ def write(data, fieldnames):
         columns = columns.removesuffix(",")
 
         placeholders = ",".join(["?"] * len(fieldnames))
-        placeholders = placeholders.removesuffix(",")
 
         for row in data:
             # list with all the data that should be insert into the database
             values = []
             for col in fieldnames:
-                values.append(row[col])
+                values.append(row.get(col))
 
             try:
                 cursor.execute(
-                    f"INSERT INTO data ({columns})" f"VALUES ({placeholders}) ",
+                    f"INSERT INTO Data ({columns})" f"VALUES ({placeholders}) ",
                     (values),
                 )
             except sqlite3.IntegrityError:
