@@ -7,6 +7,7 @@ A simple Python script that reads data from a `.csv` file and stores it into a S
 * Reads CSV files
 * Autonatically detects the delimiter used
 * Automatically creates a SQLite table based on CSV headers
+* Automatically detects is data is INTERGER, REAL or TEXT
 * Inserts all rows into the database
 * Handles UTF-8 encoded files
 
@@ -78,7 +79,6 @@ Bob;30;Paris
 
 * Database file: `data.db`
 * Table name: `Data`
-* All columns are stored as `TEXT`
 * Column names are based from CSV headers:
 
   * Spaces are replaced with underscores (`_`)
@@ -88,6 +88,7 @@ Bob;30;Paris
 ## ⚠️ Notes
 
 * If the file is not found, the script will raise a file not found error
+* If file does not end in `.csv`, the script will keep asking for the file name
 * Duplicate or conflicting inserts may be ignored
 * If delimiter is not found an error will be rasised
 
@@ -95,7 +96,6 @@ Bob;30;Paris
 
 ## 🔧 Possible Improvements
 
-* Automatic data type detection (INTEGER, REAL, etc.)
 * Command-line arguments instead of input prompt
 * Better error handling and logging
 
