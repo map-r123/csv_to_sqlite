@@ -1,7 +1,6 @@
 import csv
 import sqlite3
 from pathlib import Path
-import sys
 from detect_delimiter import detect
 
 def read_file(file_name):
@@ -20,16 +19,16 @@ def read_file(file_name):
 
             return output, reader.fieldnames
     except TypeError as error:
-        sys.exit("Delimiter not found")
+        raise TypeError("Delimiter not found")
     except FileNotFoundError :
         error = file_name+" was not found"
         raise FileNotFoundError(error)
 
 
-def create_db(fieldnames):
+def create_db(data, fieldnames):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
-    table = get_column_names(fieldnames)
+    table = get_column_names(fieldnames, data)
 
     try:
         cursor.execute(f"CREATE TABLE IF NOT EXISTS Data ({table});")
@@ -42,11 +41,29 @@ def create_db(fieldnames):
     conn.close()
 
 
-def get_column_names(fieldnames):
+def get_column_names(fieldnames, data):
     table = ""
     for column in fieldnames:
-        table += f'{column.replace(" ","_")} TEXT,'
+        value = data[1][column]
+        table += f'{column.replace(" ","_")} {detect_type(value)},'
     return table.removesuffix(",")
+
+# Detects the type of the data 
+def detect_type(value):
+    
+    try:
+        float(value)
+        return "REAL"
+    except:
+        pass
+
+    try: 
+        int(value)
+        return "INTERGER"
+    except:
+        pass
+
+    return "TEXT"
 
 
 # Function to write the data from the csv to the a sqlite database
@@ -62,7 +79,7 @@ def write(data, fieldnames):
         columns = columns.removesuffix(",")
 
         placeholders = ",".join(["?"] * len(fieldnames))
-        
+
         #creates a list of list with the individual rows inside a list
         values = []
         for row in data:
@@ -76,8 +93,8 @@ def write(data, fieldnames):
             cursor.executemany(
                 f"INSERT INTO Data ({columns})" f"VALUES ({placeholders}) ", values
             )
-        except sqlite3.IntegrityError:
-            pass
+        except sqlite3.IntegrityError as error:
+            print(error)
         print("Table created")
         conn.commit()
         cursor.close()
@@ -91,7 +108,7 @@ def main():
         file_name = input("Enter CSV Name: ")
 
     data, fieldnames = read_file(file_name)
-    create_db(fieldnames)
+    create_db(data, fieldnames)
     write(data, fieldnames)
 
 
