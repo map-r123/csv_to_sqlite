@@ -3,16 +3,17 @@ import sqlite3
 from pathlib import Path
 from detect_delimiter import detect
 
+# Reads the csv file
 def read_file(file_name):
     output = []
-    
+
     try:
         with open(file_name, newline="", encoding="UTF-8-sig") as file:
             # Detects the limiter used
             delimiter = detect(file.read())
             file.seek(0)
 
-            reader = csv.DictReader(file,delimiter=delimiter)
+            reader = csv.DictReader(file, delimiter=delimiter)
 
             for row in reader:
                 output.append(row)
@@ -20,11 +21,11 @@ def read_file(file_name):
             return output, reader.fieldnames
     except TypeError as error:
         raise TypeError("Delimiter not found")
-    except FileNotFoundError :
-        error = file_name+" was not found"
+    except FileNotFoundError:
+        error = file_name + " was not found"
         raise FileNotFoundError(error)
 
-
+# Creates the table
 def create_db(data, fieldnames):
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
@@ -40,7 +41,7 @@ def create_db(data, fieldnames):
     cursor.close()
     conn.close()
 
-
+# creates the string for columns and ensures the right data ype is used
 def get_column_names(fieldnames, data):
     table = ""
     for column in fieldnames:
@@ -48,16 +49,17 @@ def get_column_names(fieldnames, data):
         table += f'{column.replace(" ","_")} {detect_type(value)},'
     return table.removesuffix(",")
 
-# Detects the type of the data 
+
+# Detects the type of the data
 def detect_type(value):
-    
+
     try:
         float(value)
         return "REAL"
     except:
         pass
 
-    try: 
+    try:
         int(value)
         return "INTERGER"
     except:
@@ -80,10 +82,10 @@ def write(data, fieldnames):
 
         placeholders = ",".join(["?"] * len(fieldnames))
 
-        #creates a list of list with the individual rows inside a list
+        # creates a list of list with the individual rows inside a list
         values = []
         for row in data:
-            row_values =[]
+            row_values = []
             for col in fieldnames:
                 row_values.append(row.get(col))
 
