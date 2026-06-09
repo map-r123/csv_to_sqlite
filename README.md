@@ -94,13 +94,6 @@ Bob;30;Paris
 
 ---
 
-## 🔧 Possible Improvements
-
-* Command-line arguments instead of input prompt
-* Better error handling and logging
-
----
-
 ## 📄 License
 
 This project is open-source and free to use.
